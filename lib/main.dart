@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:reddit_app/core/common/error_text.dart';
 import 'package:reddit_app/core/common/loader.dart';
 import 'package:reddit_app/features/auth/controller/auth_controller.dart';
 import 'package:reddit_app/firebase_options.dart';
+import 'package:reddit_app/models/user_model.dart';
 import 'package:reddit_app/router.dart';
 import 'package:reddit_app/theme/palette.dart';
 import 'package:routemaster/routemaster.dart';
@@ -20,11 +22,27 @@ void main() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
-  // This widget is the root of your application.
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  UserModel? userModel;
+  void getData(WidgetRef ref, User data) async {
+    userModel = await ref
+        .watch(authControllerProvider.notifier)
+        .getUserData(data.uid)
+        .first;
+
+    ref.read(userProvider.notifier).update((state) => userModel);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
     //Screen Util....
     return ScreenUtilInit(
       designSize: const Size(430.0, 932.0),
@@ -39,7 +57,10 @@ class MyApp extends ConsumerWidget {
                 theme: Palette.darkModeAppTheme,
                 routerDelegate: RoutemasterDelegate(routesBuilder: (context) {
                   if (data != null) {
-                    return loggedInRoute;
+                    getData(ref, data);
+                    if (userModel != null) {
+                      return loggedInRoute;
+                    }
                   }
                   return loggedOutRoute;
                 }),

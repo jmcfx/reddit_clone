@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:reddit_app/theme/palette.dart';
+import 'package:reddit_app/core/common/loader.dart';
+import 'package:reddit_app/features/auth/controller/community_controller.dart';
 
 class CreateCommunityScreen extends ConsumerStatefulWidget {
   const CreateCommunityScreen({super.key});
@@ -19,13 +20,20 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
     communityNameController.dispose();
   }
 
+  void createCommunity() {
+    ref
+        .read(communityControllerProvider.notifier)
+        .createCommunity(communityNameController.text.trim(), context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(communityControllerProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create a community'),
       ),
-      body: Padding(
+      body: isLoading ?  const Loader() :   Padding(
         padding: const EdgeInsets.all(10.0).r,
         child: Column(
           children: [
@@ -46,18 +54,18 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
               maxLength: 21,
             ),
             SizedBox(
-              height: 10.h,
+              height: 30.h,
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: createCommunity,
               style: ElevatedButton.styleFrom(
-               // backgroundColor: Palette.blueColor,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20).r
-                )
+                  minimumSize: Size(double.infinity, 50.h),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20).r)),
+              child: Text(
+                'Create community',
+                style: TextStyle(fontSize: 17.sp),
               ),
-              child:  Text('Create community', style: TextStyle(fontSize: 17.sp),),
             )
           ],
         ),

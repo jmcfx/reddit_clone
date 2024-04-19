@@ -46,12 +46,12 @@ class Community {
 
   factory Community.fromMap(Map<String, dynamic> map) {
     return Community(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      banner: map['banner'] as String,
-      avatar: map['avatar'] as String,
-      members: List<String>.from((map['members'] )),
-      mods: List<String>.from(map['mods'])
+      id: map['id'] ?? "",
+      name: map['name'] ?? "",
+      banner: map['banner'] ?? "" ,
+      avatar: map['avatar'] ?? "",
+      members: List<String>.from((map['members' ] ?? [])) ,
+      mods: List<String>.from(map['mods'] ?? [])
     );
   }
 

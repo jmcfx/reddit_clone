@@ -4,6 +4,7 @@ import 'package:reddit_app/core/common/error_text.dart';
 import 'package:reddit_app/core/common/loader.dart';
 
 import 'package:reddit_app/features/auth/controller/community_controller.dart';
+import 'package:reddit_app/models/community_model.dart';
 import 'package:routemaster/routemaster.dart';
 
 class CommunityListDrawer extends ConsumerWidget {
@@ -11,6 +12,10 @@ class CommunityListDrawer extends ConsumerWidget {
 
   void navigateToCreateCommunity(BuildContext context) {
     Routemaster.of(context).push('/create-community-screen');
+  }
+
+  void navigateToCommunity(BuildContext context, Community community) {
+    Routemaster.of(context).push('/r/${community.name}');
   }
 
   @override
@@ -35,7 +40,9 @@ class CommunityListDrawer extends ConsumerWidget {
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(community.avatar),
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            navigateToCommunity(context, community);
+                          },
                         );
                       },
                     ),
@@ -43,7 +50,7 @@ class CommunityListDrawer extends ConsumerWidget {
                   error: (error, stackTrace) => ErrorText(
                     error: error.toString(),
                   ),
-                   loading: () => const Loader(),
+                  loading: () => const Loader(),
                 )
           ],
         ),

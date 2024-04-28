@@ -8,6 +8,7 @@ import 'package:reddit_app/core/common/loader.dart';
 import 'package:reddit_app/core/constants/constants.dart';
 import 'package:reddit_app/core/utils.dart';
 import 'package:reddit_app/features/auth/controller/community_controller.dart';
+import 'package:reddit_app/models/community_model.dart';
 import 'package:reddit_app/theme/palette.dart';
 
 class EditCommunityScreen extends ConsumerStatefulWidget {
@@ -41,8 +42,17 @@ class _EditCommunityScreenState extends ConsumerState<EditCommunityScreen> {
     }
   }
 
+  void save(Community community) {
+    ref.read(communityControllerProvider.notifier).editCommunity(
+        profileFile: profileFile,
+        bannerFile: bannerFile,
+        context: context,
+        community: community);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(communityControllerProvider);
     return ref.watch(getCommunityByNameProvider(widget.name)).when(
           data: (community) => Scaffold(
             backgroundColor: Palette.darkModeAppTheme.colorScheme.background,
@@ -50,10 +60,13 @@ class _EditCommunityScreenState extends ConsumerState<EditCommunityScreen> {
               title: const Text('Edit Community'),
               centerTitle: false,
               actions: [
-                TextButton(onPressed: () {}, child: const Text('Save'))
+                TextButton(
+                  onPressed: () => save(community),
+                  child: const Text('Save'),
+                )
               ],
             ),
-            body: Padding(
+            body: isLoading ? const Loader() :  Padding(
               padding: const EdgeInsets.all(8.0).r,
               child: Column(
                 children: [
@@ -99,12 +112,13 @@ class _EditCommunityScreenState extends ConsumerState<EditCommunityScreen> {
                                 padding: const EdgeInsets.all(16.0).r,
                                 child: GestureDetector(
                                   onTap: selectProfileImage,
-                                  child:  profileFile!= null ? CircleAvatar(
-                                    backgroundImage:  FileImage(
-                                      profileFile!
-                                    ),
-                                    radius: 32.r,
-                                  ) : CircleAvatar(
+                                  child: profileFile != null
+                                      ? CircleAvatar(
+                                          backgroundImage:
+                                              FileImage(profileFile!),
+                                          radius: 32.r,
+                                        )
+                                      : CircleAvatar(
                                           backgroundImage: NetworkImage(
                                             community.avatar,
                                           ),

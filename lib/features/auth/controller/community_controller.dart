@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:reddit_app/core/constants/constants.dart';
+import 'package:reddit_app/core/failure.dart';
 import 'package:reddit_app/core/providers/storage_repository_provider.dart';
 import 'package:reddit_app/core/utils.dart';
 import 'package:reddit_app/features/auth/controller/auth_controller.dart';
@@ -30,6 +32,9 @@ final getCommunityByNameProvider = StreamProvider.family((ref, String name) {
   return ref
       .watch(communityControllerProvider.notifier)
       .getCommunityByName(name);
+});
+final searchCommunityProvider = StreamProvider.family((ref, String query) {
+  return ref.watch(communityControllerProvider.notifier).searchCommunity(query);
 });
 
 class CommunityController extends StateNotifier<bool> {
@@ -66,6 +71,23 @@ class CommunityController extends StateNotifier<bool> {
     });
   }
 
+  void joinCommunity(Community community, BuildContext context) async {
+    final user = _ref.read(userProvider)!;
+    Either<Failure, void> res;
+    if (community.members.contains(user.uid)) {
+      res = await _communityRepository.leaveCommunity(community.name, user.uid);
+    } else {
+      res = await _communityRepository.joinCommunity(community.name, user.uid);
+    }
+    res.fold((l) => showSnackBar(context, l.message), (r) {
+      if (community.members.contains(user.uid)) {
+        showSnackBar(context, 'Community left Successfully!');
+      } else {
+        showSnackBar(context, 'Community joined Successfully!');
+      }
+    });
+  }
+
   Stream<List<Community>> getUserCommunities() {
     final uid = _ref.watch(userProvider)!.uid;
     return _communityRepository.getUserCommunities(uid);
@@ -75,11 +97,12 @@ class CommunityController extends StateNotifier<bool> {
     return _communityRepository.getCommunityByName(name);
   }
 
-  void editCommunityController(
+  void editCommunity(
       {required File? profileFile,
       required File? bannerFile,
       required BuildContext context,
       required Community community}) async {
+    state = true;
     if (profileFile != null) {
       // communities/profile/memes...
       final res = await _storageRepository.storeFile(
@@ -90,7 +113,7 @@ class CommunityController extends StateNotifier<bool> {
       res.fold((l) => showSnackBar(context, l.message),
           (r) => community = community.copyWith(avatar: r));
     }
-if (bannerFile != null) {
+    if (bannerFile != null) {
       // communities/banner/memes...
       final res = await _storageRepository.storeFile(
         path: 'communities/profile',
@@ -98,7 +121,15 @@ if (bannerFile != null) {
         file: bannerFile,
       );
       res.fold((l) => showSnackBar(context, l.message),
-          (r) => community = community.copyWith(avatar: r));
+          (r) => community = community.copyWith(banner: r));
     }
+    final res = await _communityRepository.editCommunity(community);
+    state = false;
+    res.fold((l) => showSnackBar(context, l.message),
+        (r) => Routemaster.of(context).pop());
+  }
+
+  Stream<List<Community>> searchCommunity(String query) {
+    return _communityRepository.searchCommunity(query);
   }
 }

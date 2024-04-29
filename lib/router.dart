@@ -5,6 +5,7 @@ import 'package:reddit_app/features/community/screens/create_community_screen.da
 import 'package:reddit_app/features/community/screens/edit_community_screen.dart';
 import 'package:reddit_app/features/community/screens/mod_tools_screen.dart';
 import 'package:reddit_app/features/home/screens/home_screen.dart';
+import 'package:reddit_app/features/user_profile/screens/user_profile_screen.dart';
 import 'package:routemaster/routemaster.dart';
 
 // logged out route....
@@ -27,6 +28,11 @@ final loggedInRoute = RouteMap(
         '/edit-community/:name': (routeData) => MaterialPage(
             child: EditCommunityScreen(
           name: routeData.pathParameters['name']!,
+        )),
+
+         '/u/:uid': (routeData) => MaterialPage(
+            child: UserProfileScreen(
+          uid: routeData.pathParameters['uid']!,
         ))
   },
 );

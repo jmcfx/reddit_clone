@@ -116,7 +116,7 @@ class CommunityController extends StateNotifier<bool> {
     if (bannerFile != null) {
       // communities/banner/memes...
       final res = await _storageRepository.storeFile(
-        path: 'communities/profile',
+        path: 'communities/banner',
         id: community.name,
         file: bannerFile,
       );

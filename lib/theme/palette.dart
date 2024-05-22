@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final themeNotifierProvider =
+    StateNotifierProvider<ThemeNotifier, ThemeData>((ref) {
+  return ThemeNotifier();
+});
 
 class Palette {
   // Colors
@@ -26,14 +33,15 @@ class Palette {
     ),
     primaryColor: redColor,
     colorScheme: const ColorScheme.dark(
-      background: drawerColor,
+      background: blackColor,
     ), // will be used as alternative background color
     elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ButtonStyle(
-      // Modify button style properties here
-      backgroundColor: MaterialStateProperty.all<Color>(Palette.blueColor),
-      foregroundColor: MaterialStateProperty.all<Color>(Palette.whiteColor),
-    )),
+      style: ButtonStyle(
+        // Modify button style properties here
+        backgroundColor: MaterialStateProperty.all<Color>(Palette.blueColor),
+        foregroundColor: MaterialStateProperty.all<Color>(Palette.whiteColor),
+      ),
+    ),
   );
 
   //Light Mode....
@@ -47,11 +55,50 @@ class Palette {
           color: blackColor,
         ),
       ),
+      
       drawerTheme: const DrawerThemeData(
         backgroundColor: whiteColor,
       ),
       primaryColor: redColor,
-      colorScheme: const ColorScheme.dark(
+
+      colorScheme: const ColorScheme.light(
         background: whiteColor,
       ));
+}
+
+class ThemeNotifier extends StateNotifier<ThemeData> {
+  ThemeMode _mode;
+  ThemeNotifier({ThemeMode mode = ThemeMode.dark})
+      : _mode = mode,
+        super(Palette.darkModeAppTheme) {
+    getTheme();
+  }
+
+  ThemeMode get mode => _mode;
+
+  void getTheme() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final theme = preferences.getString('theme');
+
+    if (theme == 'light') {
+      _mode = ThemeMode.light;
+      state = Palette.lightModeAppTheme;
+    } else {
+      _mode = ThemeMode.dark;
+      state = Palette.darkModeAppTheme;
+    }
+  }
+
+  void toggleTheme() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (_mode == ThemeMode.dark) {
+      _mode = ThemeMode.light;
+      state = Palette.lightModeAppTheme;
+      preferences.setString('theme', 'light');
+    } else {
+      _mode = ThemeMode.dark;
+      state = Palette.darkModeAppTheme;
+      preferences.setString('theme', 'dark');
+    }
+  }
 }

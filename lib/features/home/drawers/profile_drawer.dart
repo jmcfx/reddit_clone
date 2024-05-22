@@ -16,6 +16,10 @@ class ProfileDrawer extends ConsumerWidget {
     Routemaster.of(context).push('/u/$uid');
   }
 
+  void toggleTheme(WidgetRef ref) {
+    ref.read(themeNotifierProvider.notifier).toggleTheme();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider)!;
@@ -30,10 +34,13 @@ class ProfileDrawer extends ConsumerWidget {
             SizedBox(height: 10.h),
             Text(
               'u/${user.name}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              style:  TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500),
             ),
             SizedBox(height: 10.h),
-            const Divider(),
+             Divider(
+               thickness: 0.7.r,
+               
+            ),
             ListTile(
               title: const Text('My Profile '),
               leading: const Icon(Icons.person),
@@ -47,7 +54,7 @@ class ProfileDrawer extends ConsumerWidget {
               ),
               onTap: () => logOut(ref),
             ),
-            Switch.adaptive(value: true, onChanged: (val) {})
+            Switch.adaptive(value: ref.watch(themeNotifierProvider.notifier).mode == ThemeMode.dark , onChanged: (val)=> toggleTheme(ref) )
           ],
         ),
       ),

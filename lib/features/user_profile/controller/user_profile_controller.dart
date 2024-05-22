@@ -40,6 +40,8 @@ class UserProfileController extends StateNotifier<bool> {
       required String name}) async {
     state = true;
     UserModel user = _ref.read(userProvider)!;
+
+    //Update Profile..
     if (profileFile != null) {
       // communities/profile/memes...
       final res = await _storageRepository.storeFile(
@@ -50,8 +52,8 @@ class UserProfileController extends StateNotifier<bool> {
       res.fold((l) => showSnackBar(context, l.message),
           (r) => user = user.copyWith(profilePic: r));
     }
+    //Update Banner..
     if (bannerFile != null) {
-      //
       final res = await _storageRepository.storeFile(
         path: 'users/banner',
         id: user.uid,
@@ -60,6 +62,10 @@ class UserProfileController extends StateNotifier<bool> {
       res.fold((l) => showSnackBar(context, l.message),
           (r) => user = user.copyWith(banner: r));
     }
+      //Update user name..
+    user = user.copyWith(name: name);
+
+    //Save changes to repository..
     final res = await _userProfileRepository.editProfile(user);
     state = false;
     res.fold((l) => showSnackBar(context, l.message),

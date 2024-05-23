@@ -155,7 +155,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 hintText: 'Name',
                                 focusedBorder: OutlineInputBorder(
                                   borderSide:
-                                      const BorderSide(color: Colors.black),
+                                      const BorderSide(color: Colors.blue),
                                   borderRadius: BorderRadius.circular(10.r),
                                 ),
                                 border: InputBorder.none,

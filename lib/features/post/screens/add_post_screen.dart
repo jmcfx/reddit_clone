@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:reddit_app/core/common/add_post_cards.dart';
 import 'package:reddit_app/theme/palette.dart';
+import 'package:routemaster/routemaster.dart';
 
 class AddPostScreen extends ConsumerWidget {
   const AddPostScreen({super.key});
+
+  void navigateToType(BuildContext context, String type) {
+    Routemaster.of(context).push('/add-post/$type');
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,68 +21,33 @@ class AddPostScreen extends ConsumerWidget {
     final currentTheme = ref.watch(themeNotifierProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        //image....
         AddPostCards(
           cardHeightWidth: cardHeightWidth,
           currentTheme: currentTheme,
           iconSize: iconSize,
           icons: Icons.image_outlined,
-          onTap: () {},
+          onTap: () => navigateToType(context,'image' ),
         ),
-         AddPostCards(
+        //text....
+        AddPostCards(
           cardHeightWidth: cardHeightWidth,
           currentTheme: currentTheme,
           iconSize: iconSize,
           icons: Icons.font_download_outlined,
-          onTap: (){},
+           onTap: () => navigateToType(context, 'text'),
         ),
+        //link....
         AddPostCards(
           cardHeightWidth: cardHeightWidth,
           currentTheme: currentTheme,
           iconSize: iconSize,
           icons: Icons.link_outlined,
-          onTap: () {},
+          onTap: () => navigateToType(context, 'link'),
         ),
       ],
-    );
-  }
-}
-
-class AddPostCards extends StatelessWidget {
-  const AddPostCards({
-    super.key,
-    required this.cardHeightWidth,
-    required this.currentTheme,
-    required this.iconSize, this.onTap, this.icons,
-  });
-
-  final double cardHeightWidth;
-  final ThemeData currentTheme;
-  final double iconSize;
-  final void Function()? onTap;
-  final IconData? icons;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: SizedBox(
-        height: cardHeightWidth,
-        width: cardHeightWidth,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          color: currentTheme.colorScheme.background,
-          elevation: 16.r,
-          child: Center(
-            child: Icon(
-              icons,
-              size: iconSize,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:reddit_app/features/community/screens/create_community_screen.da
 import 'package:reddit_app/features/community/screens/edit_community_screen.dart';
 import 'package:reddit_app/features/community/screens/mod_tools_screen.dart';
 import 'package:reddit_app/features/home/screens/home_screen.dart';
+import 'package:reddit_app/features/post/screens/add_post_type_screen.dart';
 import 'package:reddit_app/features/user_profile/screens/edit_profile_screen.dart';
 import 'package:reddit_app/features/user_profile/screens/user_profile_screen.dart';
 import 'package:routemaster/routemaster.dart';
@@ -23,24 +24,35 @@ final loggedInRoute = RouteMap(
     //communityScreen route....
     '/r/:name': (route) => MaterialPage(
         child: CommunityScreen(name: route.pathParameters['name']!)),
-        //mod tools route....
-        '/mod-tools/:name': (routeData) =>  MaterialPage(child: ModToolsScreen( name: routeData.pathParameters['name']!,)),
+    //mod tools route....
+    '/mod-tools/:name': (routeData) => MaterialPage(
+            child: ModToolsScreen(
+          name: routeData.pathParameters['name']!,
+        )),
 
-        // EditCommunityScreen route ...
-        '/edit-community/:name': (routeData) => MaterialPage(
+    // EditCommunityScreen route ...
+    '/edit-community/:name': (routeData) => MaterialPage(
             child: EditCommunityScreen(
           name: routeData.pathParameters['name']!,
         )),
 
-         //UserProfileScreen route....
-         '/u/:uid': (routeData) => MaterialPage(
+    //UserProfileScreen route....
+    '/u/:uid': (routeData) => MaterialPage(
             child: UserProfileScreen(
           uid: routeData.pathParameters['uid']!,
         )),
-        // edit profile screen route ....
-         '/edit-profile/:uid': (routeData) => MaterialPage(
-            child: EditProfileScreen(
-          uid: routeData.pathParameters['uid']!,
-        )),
+    // edit profile screen route ....
+    '/edit-profile/:uid': (routeData) => MaterialPage(
+          child: EditProfileScreen(
+            uid: routeData.pathParameters['uid']!,
+          ),
+        ),
+        //
+         '/add-post/:type': (routeData) => MaterialPage(
+          child: AddPostTypeScreen(
+            type: routeData.pathParameters['type']!,
+          ),
+        ),
+      
   },
 );

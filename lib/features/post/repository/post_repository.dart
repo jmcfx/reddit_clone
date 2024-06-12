@@ -5,6 +5,7 @@ import 'package:reddit_app/core/constants/firebase_constants.dart';
 import 'package:reddit_app/core/failure.dart';
 import 'package:reddit_app/core/providers/firebase_providers.dart';
 import 'package:reddit_app/core/type_def.dart';
+import 'package:reddit_app/models/community_model.dart';
 import 'package:reddit_app/models/post_model.dart';
 
 final postRepositoryProvider = Provider((ref) {
@@ -19,7 +20,7 @@ class PostRepository {
   CollectionReference get _posts =>
       _fireStore.collection(FirebaseConstants.postsCollection);
 
-      FutureVoid addPost(Post post) async {
+  FutureVoid addPost(Post post) async {
     try {
       return right(_posts.doc(post.id).set(post.toMap()));
     } on FirebaseException catch (e) {
@@ -27,5 +28,48 @@ class PostRepository {
     } catch (e) {
       return left(Failure(e.toString()));
     }
+  }
+
+  Stream<List<Post>> fetchUserPosts(List<Community> communities) {
+    return _posts
+        .where('communityName',
+            whereIn: communities.map((e) => e.name).toList())
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (event) => event.docs
+              .map((e) => Post.fromMap(e.data() as Map<String, dynamic>))
+              .toList(),
+        );
+  }
+
+  FutureVoid deletePost(Post post) async {
+    try {
+      return right(_posts.doc(post.id).delete());
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  void upVote(Post post, String userId) async {
+    if (post.downVotes.contains(userId)) {
+      _posts.doc(post.id).update({
+        'downVotes' : FieldValue.arrayRemove([userId])
+      });
+    }
+
+    if (post.upVotes.contains(userId)) {
+        _posts.doc(post.id).update({
+        'upVotes': FieldValue.arrayRemove([userId])
+      });
+      
+    }else{
+        _posts.doc(post.id).update({
+        'upVotes': FieldValue.arrayUnion([userId])
+      });
+    }
+    
   }
 }

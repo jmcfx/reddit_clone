@@ -44,6 +44,7 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
       });
     }
   }
+
   void sharePost() {
     if (widget.type == 'image' &&
         bannerFile != null &&
@@ -78,6 +79,7 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
     final isTypeText = widget.type == "text";
     final isTypeLink = widget.type == "link";
     final currentTheme = ref.watch(themeNotifierProvider);
+    final isLoading = ref.watch(postControllerProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text('Post ${widget.type}'),
@@ -88,102 +90,104 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
           )
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(8.0.r),
-        child: Column(
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                filled: true,
-                hintText: 'Enter Title here',
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(18.r),
-              ),
-              maxLength: 30,
-            ),
-            SizedBox(height: 10.r),
-            if (isTypeImage)
-              GestureDetector(
-                onTap: selectBannerImage,
-                child: DottedBorder(
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(10).r,
-                  dashPattern: const [10, 4],
-                  strokeCap: StrokeCap.round,
-                  color: currentTheme.textTheme.bodyMedium!.color!,
-                  child: Container(
-                    width: double.infinity,
-                    height: 150.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10).r,
+      body: isLoading
+          ? const Loader()
+          : Padding(
+              padding: EdgeInsets.all(8.0.r),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      hintText: 'Enter Title here',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(18.r),
                     ),
-                    child: bannerFile != null
-                        ? Image.file(bannerFile!)
-                        : const Center(
-                            child: Icon(
-                              Icons.camera_alt_outlined,
-                              size: 40,
-                            ),
+                    maxLength: 30,
+                  ),
+                  SizedBox(height: 10.r),
+                  if (isTypeImage)
+                    GestureDetector(
+                      onTap: selectBannerImage,
+                      child: DottedBorder(
+                        borderType: BorderType.RRect,
+                        radius: const Radius.circular(10).r,
+                        dashPattern: const [10, 4],
+                        strokeCap: StrokeCap.round,
+                        color: currentTheme.textTheme.bodyMedium!.color!,
+                        child: Container(
+                          width: double.infinity,
+                          height: 150.h,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10).r,
                           ),
+                          child: bannerFile != null
+                              ? Image.file(bannerFile!)
+                              : const Center(
+                                  child: Icon(
+                                    Icons.camera_alt_outlined,
+                                    size: 40,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  if (isTypeText)
+                    TextField(
+                      controller: descriptionController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        hintText: 'Enter Description here',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(18.r),
+                      ),
+                      maxLines: 5,
+                    ),
+                  if (isTypeLink)
+                    TextField(
+                      controller: linkController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        hintText: 'Enter Link here',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(18.r),
+                      ),
+                    ),
+                  SizedBox(height: 20.h),
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text('Select Community'),
                   ),
-                ),
+                  ref.watch(userCommunitiesProvider).when(
+                        data: (data) {
+                          communities = data;
+                          if (data.isEmpty) {
+                            return const SizedBox();
+                          }
+                          return DropdownButton(
+                            value: selectedCommunity ?? data[0],
+                            items: data
+                                .map((e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e.name),
+                                    ))
+                                .toList(),
+                            onChanged: (val) {
+                              setState(() {
+                                selectedCommunity = val;
+                              });
+                            },
+                          );
+                        },
+                        error: (error, stackTrace) => ErrorText(
+                          error: error.toString(),
+                        ),
+                        loading: () => const Loader(),
+                      )
+                ],
               ),
-            if (isTypeText)
-              TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(
-                  filled: true,
-                  hintText: 'Enter Description here',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(18.r),
-                ),
-                maxLines: 5,
-              ),
-            if (isTypeLink)
-              TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(
-                  filled: true,
-                  hintText: 'Enter Link here',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(18.r),
-                ),
-              ),
-            SizedBox(height: 20.h),
-            const Align(
-              alignment: Alignment.topLeft,
-              child: Text('Select Community'),
             ),
-            ref.watch(userCommunitiesProvider).when(
-                  data: (data) {
-                    communities = data;
-                    if (data.isEmpty) {
-                      return const SizedBox();
-                    }
-                    return DropdownButton(
-                      value: selectedCommunity ?? data[0],
-                      items: data
-                          .map((e) => DropdownMenuItem(
-                                value: e,
-                                child: Text(e.name),
-                              ))
-                          .toList(),
-                      onChanged: (val) {
-                        setState(() {
-                          selectedCommunity = val;
-                        });
-                      },
-                    );
-                  },
-                  error: (error, stackTrace) => ErrorText(
-                    error: error.toString(),
-                  ),
-                  loading: () => const Loader(),
-                )
-          ],
-        ),
-      ),
     );
   }
 }

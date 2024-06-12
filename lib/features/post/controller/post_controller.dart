@@ -20,6 +20,12 @@ final postControllerProvider =
       storageRepository: storageRepository);
 });
 
+final userPostProvider =
+    StreamProvider.family((ref, List<Community> communities) {
+  final postController = ref.watch(postControllerProvider.notifier);
+  return postController.fetchUserPosts(communities);
+});
+
 class PostController extends StateNotifier<bool> {
   final PostRepository _postRepository;
   final Ref _ref;
@@ -120,7 +126,7 @@ class PostController extends StateNotifier<bool> {
         commentCount: 0,
         username: user.name,
         uid: user.uid,
-        type: 'link',
+        type: 'image',
         createdAt: DateTime.now(),
         awards: [],
         link: r,
@@ -132,5 +138,23 @@ class PostController extends StateNotifier<bool> {
         Routemaster.of(context).pop();
       });
     });
+  }
+
+  Stream<List<Post>> fetchUserPosts(List<Community> communities) {
+    if (communities.isNotEmpty) {
+      return _postRepository.fetchUserPosts(communities);
+    }
+    return Stream.value([]);
+  }
+
+  void deletePost(Post post, BuildContext context) async {
+    final res =  await _postRepository.deletePost(post);
+    res.fold((l) => null, (r) => showSnackBar(context, ' Post Deleted successfully! '));
+  }
+
+  void upVote( Post post , String userId) async{
+
+    
+
   }
 }

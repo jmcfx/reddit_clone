@@ -53,23 +53,44 @@ class PostRepository {
     }
   }
 
+
+   //downVote....
   void upVote(Post post, String userId) async {
     if (post.downVotes.contains(userId)) {
       _posts.doc(post.id).update({
-        'downVotes' : FieldValue.arrayRemove([userId])
+        'downVotes': FieldValue.arrayRemove([userId])
       });
     }
 
     if (post.upVotes.contains(userId)) {
-        _posts.doc(post.id).update({
+      _posts.doc(post.id).update({
         'upVotes': FieldValue.arrayRemove([userId])
       });
-      
-    }else{
-        _posts.doc(post.id).update({
+    } else {
+      _posts.doc(post.id).update({
         'upVotes': FieldValue.arrayUnion([userId])
       });
     }
-    
   }
+
+
+    //downVote....
+  void downVote(Post post, String userId) async {
+    if (post.upVotes.contains(userId)) {
+      _posts.doc(post.id).update({
+        'upVotes': FieldValue.arrayRemove([userId])
+      });
+    }
+
+    if (post.downVotes.contains(userId)) {
+      _posts.doc(post.id).update({
+        'downVotes': FieldValue.arrayRemove([userId])
+      });
+    } else {
+      _posts.doc(post.id).update({
+        'downVotes': FieldValue.arrayUnion([userId])
+      });
+    }
+  }
+
 }

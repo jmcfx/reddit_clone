@@ -148,13 +148,21 @@ class PostController extends StateNotifier<bool> {
   }
 
   void deletePost(Post post, BuildContext context) async {
-    final res =  await _postRepository.deletePost(post);
-    res.fold((l) => null, (r) => showSnackBar(context, ' Post Deleted successfully! '));
+    final res = await _postRepository.deletePost(post);
+    res.fold((l) => null,
+        (r) => showSnackBar(context, ' Post Deleted successfully! '));
   }
 
-  void upVote( Post post , String userId) async{
-
-    
-
+  void upVote(Post post) async {
+    final uid = _ref.read(userProvider)!.uid;
+    _postRepository.upVote(post, uid);
   }
+
+
+void downVote(Post post) async {
+    final uid = _ref.read(userProvider)!.uid;
+    _postRepository.downVote(post, uid);
+  }
+
+
 }

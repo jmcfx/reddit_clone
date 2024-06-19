@@ -1,4 +1,5 @@
 import 'package:any_link_preview/any_link_preview.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -34,7 +35,7 @@ class PostCard extends ConsumerWidget {
     Routemaster.of(context).push('/u/${post.uid}');
   }
 
-void navigateToCommunity(BuildContext context) {
+  void navigateToCommunity(BuildContext context) {
     Routemaster.of(context).push('/r/${post.communityName}');
   }
 
@@ -71,10 +72,10 @@ void navigateToCommunity(BuildContext context) {
                               Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () => navigateToCommunity(context) ,
+                                    onTap: () => navigateToCommunity(context),
                                     child: CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(post.communityProfilePic),
+                                      backgroundImage: NetworkImage(
+                                          post.communityProfilePic),
                                       radius: 16.r,
                                     ),
                                   ),
@@ -92,7 +93,7 @@ void navigateToCommunity(BuildContext context) {
                                           ),
                                         ),
                                         GestureDetector(
-                                          onTap: () => navigateToUser(context) ,
+                                          onTap: () => navigateToUser(context),
                                           child: Text(
                                             'u/${post.username}',
                                             style: TextStyle(
@@ -128,9 +129,12 @@ void navigateToCommunity(BuildContext context) {
                               height:
                                   MediaQuery.of(context).size.height * 0.35.h,
                               width: double.infinity,
-                              child: Image.network(
-                                post.link!,
+                              child: CachedNetworkImage(
                                 fit: BoxFit.cover,
+                                imageUrl: post.link!,
+                                placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               ),
                             ),
                           if (isTypeLink)
@@ -199,7 +203,8 @@ void navigateToCommunity(BuildContext context) {
                                     data: (data) {
                                       if (data.mods.contains(user.uid)) {
                                         return IconButton(
-                                          onPressed: () {},
+                                          onPressed: () =>
+                                              deletePost(ref, context),
                                           icon: const Icon(
                                               Icons.admin_panel_settings),
                                         );

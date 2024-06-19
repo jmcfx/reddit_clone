@@ -5,18 +5,22 @@ import 'package:reddit_app/core/providers/storage_repository_provider.dart';
 import 'package:reddit_app/core/utils.dart';
 import 'package:reddit_app/features/auth/controller/auth_controller.dart';
 import 'package:reddit_app/features/user_profile/repository/user_profile_repository.dart';
+import 'package:reddit_app/models/post_model.dart';
 import 'package:reddit_app/models/user_model.dart';
 import 'package:routemaster/routemaster.dart';
-
 
 final userProfileControllerProvider =
     StateNotifierProvider<UserProfileController, bool>((ref) {
   final userProfileRepository = ref.watch(userProfileRepositoryProvider);
   final storageRepository = ref.watch(storageRepositoryProvider);
   return UserProfileController(
-      communityRepository:userProfileRepository,
+      communityRepository: userProfileRepository,
       ref: ref,
       storageRepository: storageRepository);
+});
+
+final getUserPostsProvider = StreamProvider.family((ref , String uid) {
+  return ref.read(userProfileControllerProvider.notifier).getUserPosts(uid) ;
 });
 
 
@@ -62,16 +66,19 @@ class UserProfileController extends StateNotifier<bool> {
       res.fold((l) => showSnackBar(context, l.message),
           (r) => user = user.copyWith(banner: r));
     }
-      //Update user name..
+    //Update user name..
     user = user.copyWith(name: name);
 
     //Save changes to repository..
     final res = await _userProfileRepository.editProfile(user);
     state = false;
-    res.fold((l) => showSnackBar(context, l.message),
-     (r) {
+    res.fold((l) => showSnackBar(context, l.message), (r) {
       _ref.read(userProvider.notifier).update((state) => user);
       Routemaster.of(context).pop();
     });
+  }
+
+  Stream<List<Post>> getUserPosts(String uid) {
+    return _userProfileRepository.getUserPosts(uid);
   }
 }

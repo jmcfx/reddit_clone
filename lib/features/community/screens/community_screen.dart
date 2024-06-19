@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:reddit_app/core/common/error_text.dart';
 import 'package:reddit_app/core/common/loader.dart';
+import 'package:reddit_app/core/common/post_card.dart';
 import 'package:reddit_app/features/auth/controller/auth_controller.dart';
 import 'package:reddit_app/features/auth/controller/community_controller.dart';
 import 'package:reddit_app/models/community_model.dart';
@@ -20,8 +21,10 @@ class CommunityScreen extends ConsumerWidget {
     Routemaster.of(context).push('/mod-tools/$name');
   }
 
-  void joinCommunity(WidgetRef ref, Community community,  BuildContext context) {
-    ref.read(communityControllerProvider.notifier).joinCommunity(community, context);
+  void joinCommunity(WidgetRef ref, Community community, BuildContext context) {
+    ref
+        .read(communityControllerProvider.notifier)
+        .joinCommunity(community, context);
   }
 
 // r/memes
@@ -30,100 +33,112 @@ class CommunityScreen extends ConsumerWidget {
     final user = ref.watch(userProvider)!;
     return Scaffold(
       body: ref.watch(getCommunityByNameProvider(name)).when(
-          data: (community) => NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    SliverAppBar(
-                      expandedHeight: 150.h,
-                      floating: true,
-                      snap: true,
-                      flexibleSpace: Stack(
-                        children: [
-                          Positioned.fill(
-                              child: Image.network(
-                            community.banner,
-                            fit: BoxFit.cover,
-                          ))
-                        ],
-                      ),
+            data: (community) => NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    expandedHeight: 150.h,
+                    floating: true,
+                    snap: true,
+                    flexibleSpace: Stack(
+                      children: [
+                        Positioned.fill(
+                            child: Image.network(
+                          community.banner,
+                          fit: BoxFit.cover,
+                        ))
+                      ],
                     ),
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16).r,
-                      sliver: SliverList(
-                        delegate: SliverChildListDelegate([
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(community.avatar),
-                              radius: 35.r,
-                            ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16).r,
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(community.avatar),
+                            radius: 35.r,
                           ),
-                          SizedBox(
-                            height: 5.h,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'r/${community.name}',
-                                style: TextStyle(
-                                  fontSize: 19.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        ),
+                        SizedBox(
+                          height: 5.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'r/${community.name}',
+                              style: TextStyle(
+                                fontSize: 19.sp,
+                                fontWeight: FontWeight.bold,
                               ),
-                              community.mods.contains(user.uid)
-                                  ? OutlinedButton(
-                                      onPressed: () {
-                                        navigateToModTools(context);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20).r,
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 25.h,
-                                        ),
-                                        side: BorderSide(
-                                            width: 0.4.w, color: Colors.white),
+                            ),
+                            community.mods.contains(user.uid)
+                                ? OutlinedButton(
+                                    onPressed: () {
+                                      navigateToModTools(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20).r,
                                       ),
-                                      child: const Text('Mod Tools'),
-                                    )
-                                  : OutlinedButton(
-                                      onPressed: ()=> joinCommunity(ref, community, context),
-                                      style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20).r,
-                                        ),
-                                        side: BorderSide(
-                                            width: 0.4.w, color: Colors.white),
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 25.h,
-                                        ),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 25.h,
                                       ),
-                                      child: Text(
-                                        community.members.contains(user.uid)
-                                            ? 'Joined'
-                                            : 'Join',
+                                      side: BorderSide(
+                                          width: 0.4.w, color: Colors.white),
+                                    ),
+                                    child: const Text('Mod Tools'),
+                                  )
+                                : OutlinedButton(
+                                    onPressed: () =>
+                                        joinCommunity(ref, community, context),
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20).r,
                                       ),
-                                    )
-                            ],
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(top: 10.r),
-                              child: Text('${community.members.length}'))
-                        ]),
-                      ),
+                                      side: BorderSide(
+                                          width: 0.4.w, color: Colors.white),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 25.h,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      community.members.contains(user.uid)
+                                          ? 'Joined'
+                                          : 'Join',
+                                    ),
+                                  )
+                          ],
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(top: 10.r),
+                            child: Text('${community.members.length}'))
+                      ]),
                     ),
-                  ];
-                },
-                body: Container(),
-              ),
-          error: (error, stackTrace) => ErrorText(
-                error: error.toString(),
-              ),
-          loading: () => const Loader()),
+                  ),
+                ];
+              },
+              body: ref.watch(getCommunityPostsProvider(name)).when(
+                  data: (data) {
+                    return ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final post = data[index];
+                        return PostCard(post: post);
+                      },
+                    );
+                  },
+                  error: (error, stackTrace) =>
+                      ErrorText(error: error.toString()),
+                  loading: () => const Loader()),
+            ),
+            error: (error, stackTrace) => ErrorText(error: error.toString()),
+            loading: () => const Loader(),
+          ),
     );
   }
 }

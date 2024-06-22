@@ -1,8 +1,6 @@
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:reddit_app/core/common/error_text.dart';
@@ -24,11 +22,11 @@ class PostCard extends ConsumerWidget {
   }
 
   void upVotePost(WidgetRef ref) async {
-    ref.read(postControllerProvider.notifier).downVote(post);
+    ref.read(postControllerProvider.notifier).upVote(post);
   }
 
   void downVotePost(WidgetRef ref) async {
-    ref.read(postControllerProvider.notifier).upVote(post);
+    ref.read(postControllerProvider.notifier).downVote(post);
   }
 
   void navigateToUser(BuildContext context) {
@@ -38,6 +36,13 @@ class PostCard extends ConsumerWidget {
   void navigateToCommunity(BuildContext context) {
     Routemaster.of(context).push('/r/${post.communityName}');
   }
+
+
+  void navigateToComments(BuildContext context) {
+    Routemaster.of(context).push('/post/${post.id}/comments');
+  }
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -187,7 +192,7 @@ class PostCard extends ConsumerWidget {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () => navigateToComments(context),
                                     icon: const Icon(Icons.comment),
                                   ),
                                   Text(
@@ -219,13 +224,17 @@ class PostCard extends ConsumerWidget {
                           ),
                         ],
                       ),
-                    )
+                    ),
+                    
                   ],
                 ),
               )
             ],
           ),
-        )
+        ),
+         SizedBox(
+          height: 10.h,
+        ),
       ],
     );
   }

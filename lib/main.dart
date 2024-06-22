@@ -12,6 +12,7 @@ import 'package:reddit_app/router.dart';
 import 'package:reddit_app/theme/palette.dart';
 import 'package:routemaster/routemaster.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -66,10 +67,16 @@ class _MyAppState extends ConsumerState<MyApp> {
                 }),
                 routeInformationParser: const RoutemasterParser(),
               ),
-              error: (error, stackTrace) => ErrorText(error: error.toString()),
+              error: (error, stackTrace) {
+               
+                return ErrorText(
+                  error: error.toString(),
+                );
+              },
               loading: () => const Loader(),
             );
       },
     );
   }
 }
+

@@ -5,6 +5,7 @@ import 'package:reddit_app/core/constants/firebase_constants.dart';
 import 'package:reddit_app/core/failure.dart';
 import 'package:reddit_app/core/providers/firebase_providers.dart';
 import 'package:reddit_app/core/type_def.dart';
+import 'package:reddit_app/models/comment_model.dart';
 import 'package:reddit_app/models/community_model.dart';
 import 'package:reddit_app/models/post_model.dart';
 
@@ -19,6 +20,9 @@ class PostRepository {
 
   CollectionReference get _posts =>
       _fireStore.collection(FirebaseConstants.postsCollection);
+
+  CollectionReference get _comments =>
+      _fireStore.collection(FirebaseConstants.commentsCollection);
 
   FutureVoid addPost(Post post) async {
     try {
@@ -96,5 +100,36 @@ class PostRepository {
         .doc(postId)
         .snapshots()
         .map((event) => Post.fromMap(event.data() as Map<String, dynamic>));
+  }
+
+  //addComment
+  FutureVoid addComment(Comment comment) async {
+    try {
+      await _comments.doc(comment.id).set(comment.toMap());
+
+      return right(_posts.doc(comment.postId).update({
+        'commentCount' : FieldValue .increment(1)
+      }));
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  Stream<List<Comment>> getCommentsofPost(String postId) {
+    return _comments
+        .where('postId', isEqualTo: postId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (event) => event.docs
+              .map(
+                (e) => Comment.fromMap(
+                  e.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+        );
   }
 }

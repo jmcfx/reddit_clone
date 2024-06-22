@@ -1,5 +1,5 @@
-enum ThemeMode{
-  light,dark
+enum ThemeMode { light, dark }
 
+// enums UserKarma {
 
-}
+// }

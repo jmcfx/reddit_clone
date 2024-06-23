@@ -37,12 +37,9 @@ class PostCard extends ConsumerWidget {
     Routemaster.of(context).push('/r/${post.communityName}');
   }
 
-
   void navigateToComments(BuildContext context) {
     Routemaster.of(context).push('/post/${post.id}/comments');
   }
-
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -192,7 +189,8 @@ class PostCard extends ConsumerWidget {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () => navigateToComments(context),
+                                    onPressed: () =>
+                                        navigateToComments(context),
                                     icon: const Icon(Icons.comment),
                                   ),
                                   Text(
@@ -220,19 +218,48 @@ class PostCard extends ConsumerWidget {
                                         ErrorText(error: error.toString()),
                                     loading: () => const Loader(),
                                   ),
+                              IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(20.r),
+                                        child: GridView.builder(
+                                          shrinkWrap: true,
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 4,
+                                          ),
+                                          itemCount: user.awards.length,
+                                          itemBuilder: (BuildContext context, int index) {
+                                            final award = user.awards[index];
+                                            return Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Image.asset(
+                                                Constants.awards[award]!,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.card_giftcard_outlined),
+                              )
                             ],
                           ),
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
               )
             ],
           ),
         ),
-         SizedBox(
+        SizedBox(
           height: 10.h,
         ),
       ],

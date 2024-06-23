@@ -20,55 +20,55 @@ class UserProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: ref.watch(getUserDataProvider(uid)).when(
-          data: (user) => NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    SliverAppBar(
-                      expandedHeight: 250.h,
-                      floating: true,
-                      snap: true,
-                      flexibleSpace: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: Image.network(
-                              user.banner,
-                              fit: BoxFit.cover,
-                            ),
+            data: (user) => NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    expandedHeight: 180.h,
+                    floating: true,
+                    snap: true,
+                    flexibleSpace: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Image.network(
+                            user.banner,
+                            fit: BoxFit.cover,
                           ),
-                          Container(
-                            alignment: Alignment.bottomLeft,
-                            padding:
-                                EdgeInsets.all(20.r).copyWith(bottom: 70.r),
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(user.profilePic),
-                              radius: 45.r,
-                            ),
+                        ),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.all(20.r).copyWith(bottom: 60.r, ),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(user.profilePic),
+                            radius: 35.r,
                           ),
-                          Container(
-                            alignment: Alignment.bottomLeft,
-                            padding: EdgeInsets.all(20.r),
-                            child: OutlinedButton(
-                              onPressed: () => navigateToUserEditUSer(context),
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20).r,
-                                ),
-                                side: BorderSide(
-                                    width: 0.4.w, color: Colors.white),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 25.h,
-                                ),
+                        ),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          padding: EdgeInsets.all(5.r),
+                          child: OutlinedButton(
+                            onPressed: () => navigateToUserEditUSer(context),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20).r,
                               ),
-                              child: const Text("Edit Profile"),
+                              side:
+                                  BorderSide(width: 0.4.w, color: Colors.white),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 25.h,
+                              ),
                             ),
-                          )
-                        ],
-                      ),
+                            child: const Text("Edit Profile"),
+                          ),
+                        )
+                      ],
                     ),
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16).r,
-                      sliver: SliverList(
-                        delegate: SliverChildListDelegate([
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16).r,
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -89,30 +89,35 @@ class UserProfileScreen extends ConsumerWidget {
                             height: 10.h,
                           ),
                           Divider(
-                            thickness: 2.r,
+                            thickness: 0.9.r,
                           )
-                        ]),
+                        ],
                       ),
                     ),
-                  ];
-                },
-                body: ref.watch(getUserPostsProvider(uid)).when(
+                  ),
+                ];
+              },
+              body: ref.watch(getUserPostsProvider(uid)).when(
                     data: (data) {
                       return ListView.builder(
-                          itemBuilder: (BuildContext context, int index) {
-                        final post = data[index];
-                        return PostCard(post: post);
-                      });
+                        itemCount: data.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final post = data[index];
+                          return PostCard(post: post);
+                        },
+                      );
                     },
                     error: (error, stackTrace) {
                       return ErrorText(error: error.toString());
                     },
-                    loading: () => const Loader()),
-              ),
-          error: (error, stackTrace) => ErrorText(
-                error: error.toString(),
-              ),
-          loading: () => const Loader()),
+                    loading: () => const Loader(),
+                  ),
+            ),
+            error: (error, stackTrace) => ErrorText(
+              error: error.toString(),
+            ),
+            loading: () => const Loader(),
+          ),
     );
   }
 }

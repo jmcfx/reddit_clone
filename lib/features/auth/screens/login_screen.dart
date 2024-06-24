@@ -9,6 +9,10 @@ import 'package:reddit_app/features/auth/controller/auth_controller.dart';
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
+  void signInAsGuest(WidgetRef ref, BuildContext context) {
+    ref.read(authControllerProvider.notifier).sigInAsGuest(context);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoading = ref.watch(authControllerProvider);
@@ -20,7 +24,7 @@ class LoginScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () => signInAsGuest(ref, context),
             child: const Text(
               'Skip',
               style: TextStyle(
@@ -30,32 +34,34 @@ class LoginScreen extends ConsumerWidget {
           )
         ],
       ),
-      body:isLoading ? const Loader(): Column(
-        children: [
-          SizedBox(
-            height: 30.h,
-          ),
-          Text(
-            'Dive into anything',
-            style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5.sp,
+      body: isLoading
+          ? const Loader()
+          : Column(
+              children: [
+                SizedBox(
+                  height: 30.h,
+                ),
+                Text(
+                  'Dive into anything',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5.sp,
+                  ),
+                ),
+                SizedBox(
+                  height: 30.h,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0).r,
+                  child: Image.asset(
+                    Constants.loginEmotePath,
+                    height: 400.h,
+                  ),
+                ),
+                const SignInButton()
+              ],
             ),
-          ),
-          SizedBox(
-            height: 30.h,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0).r,
-            child: Image.asset(
-              Constants.loginEmotePath,
-              height: 400.h,
-            ),
-          ),
-          const SignInButton()
-        ],
-      ),
     );
   }
 }

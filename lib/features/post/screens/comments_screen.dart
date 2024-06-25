@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:reddit_app/core/common/error_text.dart';
 import 'package:reddit_app/core/common/loader.dart';
 import 'package:reddit_app/core/common/post_card.dart';
+import 'package:reddit_app/features/auth/controller/auth_controller.dart';
 import 'package:reddit_app/features/post/controller/post_controller.dart';
 import 'package:reddit_app/features/post/widget/comment_card.dart';
 import 'package:reddit_app/models/post_model.dart';
@@ -35,24 +36,25 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: ref.watch(getPostByIdProvider(widget.postId)).when(
               data: (data) {
-                return Column(
-                  children: [
+                return Column(children: [
                   PostCard(post: data),
-                  TextField(
-                    onSubmitted: (value) => addComment(data),
-                    controller: commentController,
-                    decoration: const InputDecoration(
-                      hintText: 'What are your thoughts?',
-                      filled: true,
-                      border: InputBorder.none,
+                  if (!isGuest)
+                    TextField(
+                      onSubmitted: (value) => addComment(data),
+                      controller: commentController,
+                      decoration: const InputDecoration(
+                        hintText: 'What are your thoughts?',
+                        filled: true,
+                        border: InputBorder.none,
+                      ),
                     ),
-                  ),
-                  
                   ref.watch(getPostCommentsProvider(widget.postId)).when(
                         data: (data) {
                           return SizedBox(

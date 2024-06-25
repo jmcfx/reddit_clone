@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit_app/core/common/error_text.dart';
 import 'package:reddit_app/core/common/loader.dart';
 import 'package:reddit_app/core/common/post_card.dart';
+import 'package:reddit_app/features/auth/controller/auth_controller.dart';
 import 'package:reddit_app/features/auth/controller/community_controller.dart';
 import 'package:reddit_app/features/post/controller/post_controller.dart';
 
@@ -12,8 +13,36 @@ class FeedScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(userCommunitiesProvider).when(
-          data: (communities) => ref.watch(userPostProvider(communities)).when(
+    final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
+    if (isGuest) {
+      return ref.watch(userCommunitiesProvider).when(
+            data: (communities) =>
+                ref.watch(userPostProvider(communities)).when(
+                      data: (data) {
+                        return ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final post = data[index];
+                              return PostCard(post: post);
+                            });
+                      },
+                      error: (error, stackTrace) {
+                        if (kDebugMode) print(error);
+                        return ErrorText(
+                          error: error.toString(),
+                        );
+                      },
+                      loading: () => const Loader(),
+                    ),
+            error: (error, stackTrace) => ErrorText(
+              error: error.toString(),
+            ),
+            loading: () => const Loader(),
+          );
+    }
+ return ref.watch(userCommunitiesProvider).when(
+          data: (communities) => ref.watch(guestPostProvider).when(
                 data: (data) {
                   return ListView.builder(
                       itemCount: data.length,
@@ -23,7 +52,7 @@ class FeedScreen extends ConsumerWidget {
                       });
                 },
                 error: (error, stackTrace) {
-                 if(kDebugMode) print(error);
+                  if (kDebugMode) print(error);
                   return ErrorText(
                     error: error.toString(),
                   );
@@ -33,9 +62,7 @@ class FeedScreen extends ConsumerWidget {
           error: (error, stackTrace) => ErrorText(
             error: error.toString(),
           ),
-
-        loading: () => const Loader(),
+          loading: () => const Loader(),
         );
   }
 }
-
